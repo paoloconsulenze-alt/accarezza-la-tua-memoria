@@ -1,0 +1,12 @@
+{
+  "name": "Accarezza la tua memoria",
+  "short_name": "Memoria",
+  "description": "Piccoli esercizi per allenare la mente e richiamare ricordi che fanno bene.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#eef7f1",
+  "theme_color": "#3f7f5d",
+  "lang": "it",
+  "icons": []
+}
