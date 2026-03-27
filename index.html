@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Accarezza la tua memoria</title>
+  <style>
+    body { margin:0; font-family:Arial,sans-serif; background:linear-gradient(180deg,#eef7f1 0%,#ffffff 100%); color:#2f3a33; }
+    .container { max-width:760px; margin:0 auto; padding:24px 18px 40px; }
+    .card { background:#ffffff; border-radius:18px; padding:22px; box-shadow:0 8px 24px rgba(0,0,0,0.08); margin-bottom:18px; }
+    .hidden { display:none !important; }
+    h1 { text-align:center; margin-bottom:8px; font-size:2rem; color:#2c5c42; }
+    .subtitle { text-align:center; font-size:1.05rem; color:#56655d; margin-bottom:24px; line-height:1.5; }
+    h2 { margin-top:0; color:#2c5c42; font-size:1.3rem; }
+    .words { display:flex; flex-wrap:wrap; gap:10px; margin:16px 0; }
+    .word { background:#e8f4ec; border:1px solid #cfe5d7; padding:10px 14px; border-radius:999px; font-weight:bold; font-size:1.05rem; }
+    button { background:#3f7f5d; color:white; border:none; border-radius:12px; padding:12px 18px; font-size:1rem; cursor:pointer; margin-top:10px; margin-right:8px; }
+    button:hover { background:#33694d; }
+    .secondary-btn { background:#6f8a79; }
+    .secondary-btn:hover { background:#5f7869; }
+    .choice-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+    input[type="text"] { width:100%; padding:12px; margin:8px 0; border-radius:10px; border:1px solid #cbd5cf; font-size:1rem; box-sizing:border-box; }
+    .question { font-size:1.08rem; line-height:1.6; margin-bottom:10px; }
+    .small { color:#6a766f; font-size:0.95rem; line-height:1.5; }
+    .result { margin-top:14px; font-weight:bold; font-size:1.05rem; line-height:1.5; }
+    .step { display:inline-block; padding:6px 12px; border-radius:999px; background:#e8f4ec; color:#2c5c42; font-weight:bold; font-size:0.9rem; margin-bottom:12px; }
+    .footer { text-align:center; color:#6a766f; font-size:0.92rem; margin-top:18px; }
+    @media (max-width:600px) {
+      h1 { font-size:1.7rem; }
+      .card { padding:18px; }
+      button { width:100%; margin-right:0; }
+    }
+  </style>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <meta name="theme-color" content="#3f7f5d" />
+</head>
+<body>
+  <div class="container">
+    <h1>Accarezza la tua memoria</h1>
+    <p class="subtitle">Piccoli esercizi per allenare la mente e richiamare ricordi che fanno bene.</p>
+
+    <div class="card" id="homeCard">
+      <div class="step">Inizio</div>
+      <h2>Benvenuto</h2>
+      <p class="question">
+        Farai un piccolo percorso in 4 tappe: memoria veloce, sequenza mentale, intrusa da ricordare, custodisci questo ricordo.
+      </p>
+      <p class="small">
+        Negli esercizi 1, 2 e 3 leggerai prima le istruzioni. Quando sarai pronto, premerai “Inizia esercizio” e partirà il tempo di 5 secondi.
+      </p>
+      <button type="button" onclick="startJourney()">Inizia allenamento</button>
+    </div>
+
+    <div class="card hidden" id="memoryCard">
+      <div class="step">Tappa 1 di 4</div>
+      <h2>Memoria veloce</h2>
+      <p class="small">Vedrai alcuni numeri di due cifre per 5 secondi: prova a memorizzarli. Poi, quando spariranno, riscrivili.</p>
+      <p class="small" id="levelInfo">Si parte con il livello 1: 3 numeri. Solo se li ricordi tutti, passerai al livello 2.</p>
+      <div class="words hidden" id="wordList"></div>
+      <button type="button" id="startMemoryBtn" onclick="startMemoryExercise()">Inizia esercizio</button>
+      <div id="recallArea" class="hidden" style="margin-top:16px;">
+        <p class="small" id="recallInstructions">Scrivi i 3 numeri che ricordi.</p>
+        <input type="text" id="r1" placeholder="Numero 1" maxlength="2" inputmode="numeric" oninput="autoNext(this,'r2',2)" />
+        <input type="text" id="r2" placeholder="Numero 2" maxlength="2" inputmode="numeric" oninput="autoNext(this,'r3',2)" />
+        <input type="text" id="r3" placeholder="Numero 3" maxlength="2" inputmode="numeric" oninput="if(!document.getElementById('r4').classList.contains('hidden')) autoNext(this,'r4',2)" />
+        <input type="text" id="r4" placeholder="Numero 4" class="hidden" maxlength="2" inputmode="numeric" />
+        <button type="button" onclick="checkWords()">Controlla</button>
+        <div class="result" id="memoryResult"></div>
+        <div class="choice-row hidden" id="memoryChoiceRow">
+          <button type="button" class="secondary-btn" onclick="repeatWords()">Ripeti questo esercizio</button>
+          <button type="button" onclick="goToNextWordStep()">Vai avanti</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card hidden" id="sequenceCard">
+      <div class="step">Tappa 2 di 4</div>
+      <h2>Sequenza mentale</h2>
+      <p class="small">Vedrai una breve sequenza mista per 5 secondi: numero, parola, numero. Poi sparirà e dovrai riscriverla nello stesso ordine.</p>
+      <div class="words hidden" id="sequenceList"></div>
+      <button type="button" id="startSequenceBtn" onclick="startSequenceExercise()">Inizia esercizio</button>
+      <div id="sequenceArea" class="hidden" style="margin-top:16px;">
+        <p class="small">Scrivi i 3 elementi nello stesso ordine in cui li hai visti.</p>
+        <input type="text" id="s1" placeholder="Primo elemento" maxlength="2" inputmode="numeric" oninput="autoNext(this,'s2',2)" />
+        <input type="text" id="s2" placeholder="Secondo elemento" oninput="autoNextOnSpace(this,'s3')" />
+        <input type="text" id="s3" placeholder="Terzo elemento" />
+        <button type="button" onclick="checkSequence()">Controlla</button>
+        <div class="result" id="sequenceResult"></div>
+        <div class="choice-row hidden" id="sequenceChoiceRow">
+          <button type="button" class="secondary-btn" onclick="repeatSequence()">Ripeti questo esercizio</button>
+          <button type="button" onclick="goToIntruder()">Vai avanti</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card hidden" id="intruderCard">
+      <div class="step">Tappa 3 di 4</div>
+      <h2>L'intrusa da ricordare</h2>
+      <p class="small">Vedrai quattro parole per 5 secondi: una è l'intrusa. Poi spariranno e dovrai ricordare quale fosse.</p>
+      <div class="words hidden" id="intruderWords"></div>
+      <button type="button" id="startIntruderBtn" onclick="startIntruderExercise()">Inizia esercizio</button>
+      <div id="intruderArea" class="hidden">
+        <p class="small">Adesso scrivi quale parola era l'intrusa.</p>
+        <input type="text" id="intruderAnswer" placeholder="Scrivi la parola intrusa" />
+        <button type="button" onclick="checkIntruder()">Controlla</button>
+        <div class="result" id="intruderResult"></div>
+        <div class="choice-row hidden" id="intruderChoiceRow">
+          <button type="button" class="secondary-btn" onclick="repeatIntruder()">Ripeti questo esercizio</button>
+          <button type="button" onclick="goToMemoryFeelGood()">Vai avanti</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card hidden" id="feelGoodCard">
+      <div class="step">Tappa 4 di 4</div>
+      <h2>Custodisci questo ricordo</h2>
+      <p class="small" id="memoryThemeLabel"><strong>Tema proposto oggi:</strong> Infanzia</p>
+      <button type="button" class="secondary-btn" onclick="nextMemoryTheme()">Cambia tema</button>
+      <p class="small" id="memoryThemeText">Pensa a una persona, a un luogo o a un momento dell’infanzia che ancora oggi ti fa stare bene.</p>
+      <p class="question">Prenditi un momento di calma, lascia affiorare un ricordo che ti fa stare bene.</p>
+      <p class="small" id="memoryExamples">Esempi: un gioco, un cortile, una maestra gentile, una voce amata, una merenda felice, un nonno o una nonna.</p>
+      <p class="small"><strong>Fissalo e scrivilo di seguito:</strong></p>
+      <input type="text" id="memoryNote" placeholder="Scrivi qui il ricordo che vuoi custodire" />
+      <button type="button" onclick="saveMemoryNote()">Custodisci questo ricordo</button>
+      <div class="result" id="memorySaved"></div>
+      <p class="small" id="memorySuggestions">Per custodirlo davvero: se riguarda una persona cercala o ricordala con gratitudine, se riguarda un luogo pensa di tornarci, se riguarda un gesto semplice prova a ripeterlo oggi.</p>
+      <button type="button" onclick="newExercise()">Ricomincia il percorso</button>
+    </div>
+
+    <p class="footer">Versione guidata, pensata per essere più chiara e più facile da seguire.</p>
+  </div>
+
+  <script>
+    const sequenceWords = [
+      "Mare", "Casa", "Luna", "Bosco", "Fiore", "Vento", "Strada", "Pane",
+      "Sole", "Treno", "Ponte", "Neve", "Orto", "Libro", "Fiume", "Giardino"
+    ];
+
+    const intruderSets = [
+      { words: ["Mela", "Pera", "Tavolo", "Pesca"], intruder: "tavolo" },
+      { words: ["Cane", "Gatto", "Sedia", "Cavallo"], intruder: "sedia" },
+      { words: ["Pane", "Riso", "Libro", "Pasta"], intruder: "libro" },
+      { words: ["Mare", "Fiume", "Montagna", "Sedia"], intruder: "sedia" },
+      { words: ["Chiesa", "Altare", "Panca", "Bicicletta"], intruder: "bicicletta" },
+      { words: ["Letto", "Cuscino", "Coperta", "Forchetta"], intruder: "forchetta" },
+      { words: ["Treno", "Binario", "Stazione", "Pane"], intruder: "pane" },
+      { words: ["Scarpa", "Calza", "Cappello", "Finestra"], intruder: "finestra" },
+      { words: ["Orto", "Zappa", "Pomodoro", "Telefono"], intruder: "telefono" },
+      { words: ["Sole", "Luna", "Stella", "Tavolo"], intruder: "tavolo" },
+      { words: ["Mela", "Pera", "Pesca", "Limone"], intruder: "limone" },
+      { words: ["Treno", "Binario", "Stazione", "Valigia"], intruder: "valigia" },
+      { words: ["Chiesa", "Altare", "Panca", "Campanile"], intruder: "campanile" },
+      { words: ["Letto", "Cuscino", "Coperta", "Armadio"], intruder: "armadio" },
+      { words: ["Pane", "Vino", "Acqua", "Tavolo"], intruder: "tavolo" },
+      { words: ["Scarpa", "Calza", "Guanto", "Cappello"], intruder: "cappello" },
+      { words: ["Orto", "Zappa", "Pomodoro", "Fiore"], intruder: "fiore" },
+      { words: ["Sole", "Luna", "Stella", "Nuvola"], intruder: "nuvola" }
+    ];
+// randomizza l'ordine iniziale dei set intrusi
+intruderSets.sort(()=>Math.random()-0.5);
+
+
+    const memoryThemes = [
+      {
+        label: "Infanzia",
+        text: "Pensa a una persona, a un luogo o a un momento dell’infanzia che ancora oggi ti fa stare bene.",
+        examples: "Esempi: un gioco, un cortile, una maestra gentile, una voce amata, una merenda felice, un nonno o una nonna.",
+        suggestions: "Per custodirlo davvero: se riguarda una persona cercala o ricordala con gratitudine, se riguarda un luogo pensa di tornarci, se riguarda un gesto semplice prova a ripeterlo oggi."
+      },
+      {
+        label: "Lavoro",
+        text: "Ricorda un episodio del lavoro o di un impegno importante in cui ti sei sentito utile, sereno o soddisfatto.",
+        examples: "Esempi: un compito riuscito bene, un collega stimato, un ringraziamento ricevuto, una giornata ordinata, un lavoro fatto con cura.",
+        suggestions: "Per custodirlo davvero: riprendi un’abitudine buona di allora, racconta quell’episodio a qualcuno, oppure prova a rifare oggi un piccolo gesto che ti faceva sentire utile."
+      },
+      {
+        label: "Vacanza",
+        text: "Ripensa a una vacanza, a una gita o a un viaggio che ti ha lasciato leggerezza e buonumore.",
+        examples: "Esempi: il mare, la montagna, una passeggiata, un pranzo all’aperto, una città visitata con piacere, un panorama.",
+        suggestions: "Per custodirlo davvero: guarda una foto, richiama la persona con cui eri, riproponi una piccola uscita, oppure pensa concretamente di tornare in quel luogo."
+      },
+      {
+        label: "Famiglia",
+        text: "Lascia affiorare un momento semplice e bello vissuto in famiglia, magari con una persona che ti faceva stare bene.",
+        examples: "Esempi: una tavolata, una festa in casa, una domenica serena, una frase affettuosa, un gesto di cura, un momento condiviso.",
+        suggestions: "Per custodirlo davvero: chiama un familiare, ricrea un piccolo rito di casa, riproponi una ricetta o una consuetudine che faceva bene a tutti."
+      },
+      {
+        label: "Amicizia",
+        text: "Pensa a un amico, a una conversazione o a un gesto di amicizia che ancora oggi ti scalda il cuore.",
+        examples: "Esempi: una telefonata importante, una risata condivisa, un aiuto ricevuto, una confidenza, una passeggiata insieme.",
+        suggestions: "Per custodirlo davvero: manda un messaggio, fai una telefonata, proponi un incontro, oppure ringrazia interiormente quella persona per il bene ricevuto."
+      },
+      {
+        label: "Festa",
+        text: "Ricorda una festa, una tavolata o un incontro gioioso che ti ha lasciato una bella sensazione.",
+        examples: "Esempi: un compleanno, una festa di paese, una cena riuscita, una musica, un brindisi, un momento di allegria condivisa.",
+        suggestions: "Per custodirlo davvero: riproponi una piccola festa, invita qualcuno, rimetti quella musica, oppure ricrea un dettaglio di quella gioia nella giornata di oggi."
+      },
+      {
+        label: "Casa",
+        text: "Ripensa a una casa, a una stanza o a un’atmosfera domestica in cui ti sei sentito protetto e sereno.",
+        examples: "Esempi: la cucina di casa, un balcone, una poltrona amata, un profumo familiare, una finestra, una sera tranquilla.",
+        suggestions: "Per custodirlo davvero: sistema un angolo della casa, accendi una luce, prepara qualcosa di buono, oppure ricrea un’atmosfera che ti faceva sentire al sicuro."
+      },
+      {
+        label: "Fede",
+        text: "Ricorda un momento di preghiera, una celebrazione o un gesto di fede che ti ha dato pace.",
+        examples: "Esempi: una chiesa silenziosa, una preghiera detta con calma, una messa, una benedizione, un canto, un gesto semplice ma profondo.",
+        suggestions: "Per custodirlo davvero: torna in quel luogo, ripeti quella preghiera, accendi un momento di silenzio, oppure fai oggi un gesto buono che dia continuità a quel ricordo."
+      },
+      {
+        label: "Natura",
+        text: "Pensa a un paesaggio, a una passeggiata o a un momento all’aperto che ti ha fatto respirare meglio dentro.",
+        examples: "Esempi: un bosco, il mare, una collina, un sentiero, un tramonto, il vento sul viso, il canto degli uccelli.",
+        suggestions: "Per custodirlo davvero: fai una breve passeggiata, esci all’aria aperta, osserva il cielo, oppure programma un ritorno in un luogo naturale che ti fa stare bene."
+      },
+      {
+        label: "Luogo del cuore",
+        text: "Lascia emergere un luogo speciale in cui ti sei sentito bene e che ancora oggi ti richiama serenità.",
+        examples: "Esempi: una piazza, una chiesa, una casa, una spiaggia, una collina, una panchina, un giardino.",
+        suggestions: "Per custodirlo davvero: guarda una foto, descrivilo a qualcuno, pensane il ritorno, oppure porta nella tua giornata un piccolo dettaglio che lo richiami."
+      }
+    ];
+
+    let currentWords = [];
+    let currentIntruder = '';
+    let currentLevel = 3;
+    let allowLevel4 = false;
+    let intruderIndex = -1;
+    let intruderTimer = null;
+    let memoryTimer = null;
+    let lastIntruderDisplayKey = '';
+    let memoryThemeIndex = -1;
+    let currentSequence = [];
+    let sequenceTimer = null;
+    let lastSequenceKey = '';
+
+    function playBeep() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'sine';
+        o.frequency.setValueAtTime(800, ctx.currentTime);
+        g.gain.setValueAtTime(0.1, ctx.currentTime);
+        o.connect(g);
+        g.connect(ctx.destination);
+        o.start();
+        o.stop(ctx.currentTime + 0.2);
+      } catch(e) {}
+    }
+
+    function showOnly(cardId) {
+      document.querySelectorAll('.card').forEach(card => card.classList.add('hidden'));
+      document.getElementById(cardId).classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function normalize(text) { return text.trim().toLowerCase(); }
+    function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+    function shuffleArray(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function randomNumbers(n) {
+      const set = new Set();
+      while (set.size < n) {
+        set.add(Math.floor(Math.random() * 90) + 10);
+      }
+      return Array.from(set);
+    }
+
+    function randomTwoDigitNumber() {
+      return Math.floor(Math.random() * 90) + 10;
+    }
+
+    function buildSequence(avoidCurrent=false) {
+      let seq, key, attempts = 0;
+      do {
+        const first = randomTwoDigitNumber();
+        let second = randomTwoDigitNumber();
+        while (second === first) second = randomTwoDigitNumber();
+        const word = pickRandom(sequenceWords);
+        seq = [String(first), word, String(second)];
+        key = seq.join('|');
+        attempts++;
+      } while (avoidCurrent && key === lastSequenceKey && attempts < 20);
+      lastSequenceKey = key;
+      return seq;
+    }
+
+    function nextMemoryTheme() {
+      memoryThemeIndex = (memoryThemeIndex + 1) % memoryThemes.length;
+      const theme = memoryThemes[memoryThemeIndex];
+      document.getElementById('memoryThemeLabel').innerHTML = `<strong>Tema proposto oggi:</strong> ${theme.label}`;
+      document.getElementById('memoryThemeText').textContent = theme.text;
+      document.getElementById('memoryExamples').textContent = theme.examples;
+      document.getElementById('memorySuggestions').textContent = theme.suggestions;
+      return theme;
+    }
+
+    function autoNext(current, nextId, maxLength=2) {
+      current.value = current.value.replace(/\s+/g, '');
+      if (current.value.length > maxLength) current.value = current.value.slice(0, maxLength);
+      if (current.value.length >= maxLength) {
+        const next = document.getElementById(nextId);
+        if (next) next.focus();
+      }
+    }
+
+    function autoNextOnSpace(current, nextId) {
+      if (current.value.includes(' ')) {
+        current.value = current.value.trim();
+        const next = document.getElementById(nextId);
+        if (next) next.focus();
+      }
+    }
+
+    function prepareWordExercise() {
+      if (memoryTimer) clearTimeout(memoryTimer);
+      currentWords = randomNumbers(currentLevel);
+      document.getElementById('wordList').innerHTML = currentWords.map(item => `<span class="word">${item}</span>`).join('');
+      document.getElementById('wordList').classList.add('hidden');
+      document.getElementById('startMemoryBtn').style.display = 'inline-block';
+      document.getElementById('recallArea').classList.add('hidden');
+      document.getElementById('memoryResult').textContent = '';
+      document.getElementById('memoryChoiceRow').classList.add('hidden');
+      document.getElementById('r1').value = '';
+      document.getElementById('r2').value = '';
+      document.getElementById('r3').value = '';
+      document.getElementById('r4').value = '';
+      document.getElementById('levelInfo').textContent = currentLevel === 3
+        ? "Si parte con il livello 1: 3 numeri. Solo se li ricordi tutti, passerai al livello 2."
+        : "Bravo. Sei passato al livello 2: 4 numeri.";
+      document.getElementById('recallInstructions').textContent = currentLevel === 3
+        ? "Scrivi i 3 numeri che ricordi."
+        : "Scrivi i 4 numeri che ricordi.";
+      document.getElementById('r4').classList.toggle('hidden', currentLevel !== 4);
+    }
+
+    function scheduleMemoryHide() {
+      if (memoryTimer) clearTimeout(memoryTimer);
+      memoryTimer = setTimeout(() => {
+        playBeep();
+        document.getElementById('wordList').classList.add('hidden');
+        document.getElementById('recallArea').classList.remove('hidden');
+        document.getElementById('startMemoryBtn').style.display = 'none';
+        document.getElementById('r1').focus();
+      }, 5000);
+    }
+
+    function prepareSequenceExercise(avoidCurrent=false) {
+      if (sequenceTimer) clearTimeout(sequenceTimer);
+      currentSequence = buildSequence(avoidCurrent);
+      document.getElementById('sequenceList').innerHTML = currentSequence.map(item => `<span class="word">${item}</span>`).join('');
+      document.getElementById('sequenceList').classList.add('hidden');
+      document.getElementById('startSequenceBtn').style.display = 'inline-block';
+      document.getElementById('sequenceArea').classList.add('hidden');
+      document.getElementById('sequenceResult').textContent = '';
+      document.getElementById('sequenceChoiceRow').classList.add('hidden');
+      document.getElementById('s1').value = '';
+      document.getElementById('s2').value = '';
+      document.getElementById('s3').value = '';
+    }
+
+    function scheduleSequenceHide() {
+      if (sequenceTimer) clearTimeout(sequenceTimer);
+      sequenceTimer = setTimeout(() => {
+        playBeep();
+        document.getElementById('sequenceList').classList.add('hidden');
+        document.getElementById('sequenceArea').classList.remove('hidden');
+        document.getElementById('startSequenceBtn').style.display = 'none';
+        document.getElementById('s1').focus();
+      }, 5000);
+    }
+
+    function nextIntruderSet(avoidCurrent=false) {
+      if (intruderTimer) clearTimeout(intruderTimer);
+      let nextIndex = (intruderIndex + 1) % intruderSets.length;
+      if (avoidCurrent && intruderSets.length > 1 && nextIndex === intruderIndex) {
+        nextIndex = (nextIndex + 1) % intruderSets.length;
+      }
+      intruderIndex = nextIndex;
+      const intruder = intruderSets[intruderIndex];
+
+      let displayedWords, displayKey, attempts = 0;
+      do {
+        displayedWords = shuffleArray(intruder.words);
+        displayKey = displayedWords.join('|');
+        attempts++;
+      } while (displayKey === lastIntruderDisplayKey && attempts < 10);
+
+      lastIntruderDisplayKey = displayKey;
+      currentIntruder = intruder.intruder;
+      document.getElementById('intruderWords').innerHTML = displayedWords.map(w => `<span class="word">${w}</span>`).join('');
+      document.getElementById('intruderWords').classList.add('hidden');
+      document.getElementById('intruderAnswer').value = '';
+      document.getElementById('intruderResult').textContent = '';
+      document.getElementById('intruderChoiceRow').classList.add('hidden');
+      document.getElementById('intruderArea').classList.add('hidden');
+      document.getElementById('startIntruderBtn').style.display = 'inline-block';
+    }
+
+    function scheduleIntruderHide() {
+      if (intruderTimer) clearTimeout(intruderTimer);
+      intruderTimer = setTimeout(() => {
+        playBeep();
+        document.getElementById('intruderWords').classList.add('hidden');
+        document.getElementById('intruderArea').classList.remove('hidden');
+        document.getElementById('startIntruderBtn').style.display = 'none';
+        document.getElementById('intruderAnswer').focus();
+      }, 5000);
+    }
+
+    function prepareJourney() {
+      if (memoryTimer) clearTimeout(memoryTimer);
+      if (sequenceTimer) clearTimeout(sequenceTimer);
+      if (intruderTimer) clearTimeout(intruderTimer);
+      currentLevel = 3;
+      allowLevel4 = false;
+      prepareWordExercise();
+      prepareSequenceExercise(false);
+      nextIntruderSet(false);
+      document.getElementById('memorySaved').textContent = '';
+      document.getElementById('memoryNote').value = '';
+      memoryThemeIndex = -1;
+      nextMemoryTheme();
+    }
+
+    function startJourney() {
+      prepareJourney();
+      showOnly('memoryCard');
+    }
+
+    function startMemoryExercise() {
+      document.getElementById('wordList').classList.remove('hidden');
+      document.getElementById('recallArea').classList.add('hidden');
+      scheduleMemoryHide();
+    }
+
+    function checkWords() {
+      const given = [
+        document.getElementById('r1').value.trim(),
+        document.getElementById('r2').value.trim(),
+        document.getElementById('r3').value.trim(),
+        document.getElementById('r4').value.trim()
+      ].filter(Boolean);
+
+      let score = 0;
+      currentWords.forEach(num => { if (given.includes(String(num))) score++; });
+
+      const result = document.getElementById('memoryResult');
+      if (score === currentLevel) {
+        if (currentLevel === 3) {
+          allowLevel4 = true;
+          result.textContent = 'Ottimo! Hai ricordato tutti e 3 i numeri.';
+        } else {
+          result.textContent = 'Ottimo! Hai ricordato tutti e 4 i numeri.';
+        }
+      } else if (score >= 1) {
+        allowLevel4 = false;
+        result.textContent = `Bene. Hai ricordato ${score} numeri su ${currentLevel}.`;
+      } else {
+        allowLevel4 = false;
+        result.textContent = 'Non importa. Anche il solo tentativo è già un buon allenamento.';
+      }
+      document.getElementById('memoryChoiceRow').classList.remove('hidden');
+    }
+
+    function repeatWords() {
+      prepareWordExercise();
+    }
+
+    function goToNextWordStep() {
+      if (allowLevel4 && currentLevel === 3) {
+        currentLevel = 4;
+        prepareWordExercise();
+      } else {
+        showOnly('sequenceCard');
+      }
+    }
+
+    function startSequenceExercise() {
+      document.getElementById('sequenceList').classList.remove('hidden');
+      document.getElementById('sequenceArea').classList.add('hidden');
+      scheduleSequenceHide();
+    }
+
+    function checkSequence() {
+      const given = [
+        normalize(document.getElementById('s1').value),
+        normalize(document.getElementById('s2').value),
+        normalize(document.getElementById('s3').value)
+      ];
+      const expected = currentSequence.map(item => normalize(item));
+      let score = 0;
+      for (let i = 0; i < 3; i++) {
+        if (given[i] === expected[i]) score++;
+      }
+      const res = document.getElementById('sequenceResult');
+      if (score === 3) {
+        res.textContent = 'Ottimo! Hai ricostruito correttamente tutta la sequenza.';
+      } else if (score > 0) {
+        res.textContent = `Hai ricostruito correttamente ${score} elementi su 3. La sequenza era: ${currentSequence.join(' - ')}.`;
+      } else {
+        res.textContent = `La sequenza era: ${currentSequence.join(' - ')}.`;
+      }
+      document.getElementById('sequenceChoiceRow').classList.remove('hidden');
+    }
+
+    function repeatSequence() {
+      prepareSequenceExercise(true);
+    }
+
+    function goToIntruder() {
+      showOnly('intruderCard');
+    }
+
+    function startIntruderExercise() {
+      document.getElementById('intruderWords').classList.remove('hidden');
+      document.getElementById('intruderArea').classList.add('hidden');
+      scheduleIntruderHide();
+    }
+
+    function checkIntruder() {
+      const val = document.getElementById('intruderAnswer').value.trim().toLowerCase();
+      const res = document.getElementById('intruderResult');
+      if (!val) {
+        res.textContent = 'Prova a scrivere una parola.';
+        document.getElementById('intruderChoiceRow').classList.add('hidden');
+        return;
+      }
+      if (val === currentIntruder) {
+        res.textContent = 'Esatto! Hai ricordato bene la parola intrusa.';
+      } else {
+        res.textContent = `Non è questa. La parola intrusa era: ${currentIntruder}.`;
+      }
+      document.getElementById('intruderChoiceRow').classList.remove('hidden');
+    }
+
+    function repeatIntruder() {
+      nextIntruderSet(true);
+    }
+
+    function goToMemoryFeelGood() {
+      nextMemoryTheme();
+      showOnly('feelGoodCard');
+    }
+
+    function saveMemoryNote() {
+      const note = document.getElementById('memoryNote').value.trim();
+      const output = document.getElementById('memorySaved');
+      const theme = memoryThemes[memoryThemeIndex] || null;
+      output.textContent = note
+        ? `Ricordo custodito: ${note}.`
+        : 'Hai richiamato un ricordo che ti fa bene.';
+      if (theme) {
+        document.getElementById('memorySuggestions').textContent = theme.suggestions;
+      }
+    }
+
+    function newExercise() {
+      prepareJourney();
+      showOnly('homeCard');
+    }
+
+    prepareJourney();
+    showOnly('homeCard');
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
