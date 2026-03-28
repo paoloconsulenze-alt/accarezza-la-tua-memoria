@@ -26,7 +26,6 @@
     .step { display:inline-block; padding:6px 12px; border-radius:999px; background:#e8f4ec; color:#2c5c42; font-weight:bold; font-size:0.9rem; margin-bottom:12px; }
     .intro-animate { animation:softRise 0.7s ease-out; }
     .primary-glow { animation:gentleGlow 2.4s ease-in-out infinite; }
-    .memory-grid { display:grid; grid-template-columns:1fr; gap:8px; }
     @keyframes softRise {
       from { opacity:0; transform:translateY(10px); }
       to { opacity:1; transform:translateY(0); }
@@ -53,7 +52,7 @@
       <div class="step">Inizio</div>
       <h2>Benvenuto</h2>
       <p class="question">
-        Farai un piccolo percorso in 4 tappe: memoria veloce, sequenza mentale, intrusa da ricordare, ricordo a tema.
+        Farai un piccolo percorso in 4 tappe: memoria veloce, sequenza mentale, intrusa da ricordare, custodisci questo ricordo.
       </p>
       <p class="small">
         Negli esercizi 1, 2 e 3 leggerai prima le istruzioni. Quando sarai pronto, premerai “Inizia esercizio” e partirà il tempo di 5 secondi.
@@ -86,14 +85,15 @@
     <div class="card hidden" id="sequenceCard">
       <div class="step">Tappa 2 di 4</div>
       <h2>Sequenza mentale</h2>
-      <p class="small">Vedrai una breve sequenza mista per 5 secondi: numero, parola, numero. Poi sparirà e dovrai riscriverla nello stesso ordine.</p>
+      <p class="small">Vedrai una breve sequenza mista per 5 secondi: numero, parola, numero, parola. Poi sparirà e dovrai riscriverla nello stesso ordine.</p>
       <div class="words hidden" id="sequenceList"></div>
       <button type="button" id="startSequenceBtn" onclick="startSequenceExercise()">Inizia esercizio</button>
       <div id="sequenceArea" class="hidden" style="margin-top:16px;">
-        <p class="small">Scrivi i 3 elementi nello stesso ordine in cui li hai visti.</p>
+        <p class="small">Scrivi i 4 elementi nello stesso ordine in cui li hai visti.</p>
         <input type="text" id="s1" placeholder="Primo elemento" maxlength="2" inputmode="numeric" oninput="autoNext(this,'s2',2)" />
         <input type="text" id="s2" placeholder="Secondo elemento" oninput="autoNextOnSpace(this,'s3')" />
-        <input type="text" id="s3" placeholder="Terzo elemento" />
+        <input type="text" id="s3" placeholder="Terzo elemento" maxlength="2" inputmode="numeric" oninput="autoNext(this,'s4',2)" />
+        <input type="text" id="s4" placeholder="Quarto elemento" />
         <button type="button" onclick="checkSequence()">Controlla</button>
         <div class="result" id="sequenceResult"></div>
         <div class="choice-row hidden" id="sequenceChoiceRow">
@@ -123,38 +123,29 @@
 
     <div class="card hidden" id="feelGoodCard">
       <div class="step">Tappa 4 di 4</div>
-      <h2>Ricordo a tema</h2>
+      <h2>Custodisci questo ricordo</h2>
       <p class="small" id="memoryThemeLabel"><strong>Tema proposto oggi:</strong> Infanzia</p>
       <button type="button" class="secondary-btn" onclick="nextMemoryTheme()">Cambia tema</button>
       <p class="small" id="memoryThemeText">Pensa a una persona, a un luogo o a un momento dell’infanzia che ancora oggi ti fa stare bene.</p>
-      <p class="question">Prima fissa 3 elementi del ricordo, sempre nello stesso ordine.</p>
+      <p class="question">Prenditi un momento di calma e lascia affiorare un ricordo preciso.</p>
       <p class="small" id="memoryExamples">Esempi: un gioco, un cortile, una maestra gentile, una voce amata, una merenda felice, un nonno o una nonna.</p>
 
-      <div id="memoryWriteArea">
-        <div class="memory-grid">
-          <input type="text" id="memoryPerson" placeholder="1. Persona" />
-          <input type="text" id="memoryPlace" placeholder="2. Luogo" />
-          <input type="text" id="memoryDetail" placeholder="3. Dettaglio concreto" />
-        </div>
-        <button type="button" onclick="storeMemoryTriplet()">Ho fissato i 3 elementi</button>
-      </div>
+      <p class="small"><strong>1. Chi c’era?</strong></p>
+      <input type="text" id="memoryPerson" placeholder="Una persona o più persone presenti" />
 
-      <div id="memoryRecallArea" class="hidden">
-        <p class="question">Adesso prova a ricordarli di nuovo e riscrivili nello stesso ordine.</p>
-        <div class="memory-grid">
-          <input type="text" id="memoryPersonRecall" placeholder="1. Persona" />
-          <input type="text" id="memoryPlaceRecall" placeholder="2. Luogo" />
-          <input type="text" id="memoryDetailRecall" placeholder="3. Dettaglio concreto" />
-        </div>
-        <button type="button" onclick="checkMemoryTriplet()">Controlla</button>
-      </div>
+      <p class="small"><strong>2. Dove eri?</strong></p>
+      <input type="text" id="memoryPlace" placeholder="Il luogo del ricordo" />
 
+      <p class="small"><strong>3. Che cosa stava succedendo?</strong></p>
+      <input type="text" id="memoryAction" placeholder="Il momento o la scena che ricordi" />
+
+      <p class="small"><strong>4. Trova un dettaglio preciso.</strong></p>
+      <input type="text" id="memoryDetail" placeholder="Un suono, un odore, una frase, un oggetto..." />
+
+      <button type="button" onclick="saveMemoryNote()">Custodisci questo ricordo</button>
+      <div class="small hidden" id="memorySummary" style="margin-top:14px; background:#eef7f1; border:1px solid #d7e8dd; border-radius:12px; padding:12px 14px;"></div>
       <div class="result" id="memorySaved"></div>
-      <p class="small" id="memorySuggestions">Per allenarti meglio: richiama sempre il ricordo nello stesso ordine: persona, luogo, dettaglio.</p>
-      <div class="choice-row hidden" id="memoryThemeChoiceRow">
-        <button type="button" class="secondary-btn" onclick="repeatThemeMemory()">Ripeti questo tema</button>
-        <button type="button" onclick="newExercise()">Ricomincia il percorso</button>
-      </div>
+      <button type="button" onclick="newExercise()">Ricomincia il percorso</button>
     </div>
   </div>
 
@@ -188,66 +179,16 @@
     intruderSets.sort(() => Math.random() - 0.5);
 
     const memoryThemes = [
-      {
-        label: "Infanzia",
-        text: "Pensa a una persona, a un luogo o a un momento dell’infanzia che ancora oggi ti fa stare bene.",
-        examples: "Esempi: un gioco, un cortile, una maestra gentile, una voce amata, una merenda felice, un nonno o una nonna.",
-        suggestions: "Per allenarti meglio: richiama sempre il ricordo nello stesso ordine: persona, luogo, dettaglio."
-      },
-      {
-        label: "Lavoro",
-        text: "Ricorda un episodio del lavoro o di un impegno importante in cui ti sei sentito utile, sereno o soddisfatto.",
-        examples: "Esempi: un compito riuscito bene, un collega stimato, un ringraziamento ricevuto, una giornata ordinata, un lavoro fatto con cura.",
-        suggestions: "Per allenarti meglio: richiama una persona, il posto e un particolare concreto, sempre nello stesso ordine."
-      },
-      {
-        label: "Vacanza",
-        text: "Ripensa a una vacanza, a una gita o a un viaggio che ti ha lasciato leggerezza e buonumore.",
-        examples: "Esempi: il mare, la montagna, una passeggiata, un pranzo all’aperto, una città visitata con piacere, un panorama.",
-        suggestions: "Per allenarti meglio: fissa una persona, un luogo preciso e un dettaglio sensoriale."
-      },
-      {
-        label: "Famiglia",
-        text: "Lascia affiorare un momento semplice e bello vissuto in famiglia, magari con una persona che ti faceva stare bene.",
-        examples: "Esempi: una tavolata, una festa in casa, una domenica serena, una frase affettuosa, un gesto di cura, un momento condiviso.",
-        suggestions: "Per allenarti meglio: prova a ricordare chi c’era, dove eravate e quale piccolo dettaglio rende vivo quel ricordo."
-      },
-      {
-        label: "Amicizia",
-        text: "Pensa a un amico, a una conversazione o a un gesto di amicizia che ancora oggi ti scalda il cuore.",
-        examples: "Esempi: una telefonata importante, una risata condivisa, un aiuto ricevuto, una confidenza, una passeggiata insieme.",
-        suggestions: "Per allenarti meglio: richiama persona, luogo e dettaglio concreto."
-      },
-      {
-        label: "Festa",
-        text: "Ricorda una festa, una tavolata o un incontro gioioso che ti ha lasciato una bella sensazione.",
-        examples: "Esempi: un compleanno, una festa di paese, una cena riuscita, una musica, un brindisi, un momento di allegria condivisa.",
-        suggestions: "Per allenarti meglio: collega il ricordo a una persona, a un luogo e a un dettaglio."
-      },
-      {
-        label: "Casa",
-        text: "Ripensa a una casa, a una stanza o a un’atmosfera domestica in cui ti sei sentito protetto e sereno.",
-        examples: "Esempi: la cucina di casa, un balcone, una poltrona amata, un profumo familiare, una finestra, una sera tranquilla.",
-        suggestions: "Per allenarti meglio: richiama chi era con te, dove eri e quale particolare concreto ti torna alla mente."
-      },
-      {
-        label: "Fede",
-        text: "Ricorda un momento di preghiera, una celebrazione o un gesto di fede che ti ha dato pace.",
-        examples: "Esempi: una chiesa silenziosa, una preghiera detta con calma, una messa, una benedizione, un canto, un gesto semplice ma profondo.",
-        suggestions: "Per allenarti meglio: fissa una persona, un luogo e un dettaglio concreto del momento."
-      },
-      {
-        label: "Natura",
-        text: "Pensa a un paesaggio, a una passeggiata o a un momento all’aperto che ti ha fatto respirare meglio dentro.",
-        examples: "Esempi: un bosco, il mare, una collina, un sentiero, un tramonto, il vento sul viso, il canto degli uccelli.",
-        suggestions: "Per allenarti meglio: richiama nell’ordine una persona, un luogo e un dettaglio sensoriale."
-      },
-      {
-        label: "Luogo del cuore",
-        text: "Lascia emergere un luogo speciale in cui ti sei sentito bene e che ancora oggi ti richiama serenità.",
-        examples: "Esempi: una piazza, una chiesa, una casa, una spiaggia, una collina, una panchina, un giardino.",
-        suggestions: "Per allenarti meglio: scrivi una persona collegata a quel luogo, il luogo stesso e un dettaglio concreto."
-      }
+      { label: "Infanzia", text: "Pensa a una persona, a un luogo o a un momento dell’infanzia che ancora oggi ti fa stare bene.", examples: "Esempi: un gioco, un cortile, una maestra gentile, una voce amata, una merenda felice, un nonno o una nonna.", suggestions: "Rivivi per qualche istante questo ricordo e prova a coglierne almeno due dettagli precisi. Più il ricordo è nitido, più la memoria lavora bene." },
+      { label: "Lavoro", text: "Ricorda un episodio del lavoro o di un impegno importante in cui ti sei sentito utile, sereno o soddisfatto.", examples: "Esempi: un compito riuscito bene, un collega stimato, un ringraziamento ricevuto, una giornata ordinata, un lavoro fatto con cura.", suggestions: "Riprova a vedere la scena nella mente e cerca particolari più concreti: una persona, un luogo, un gesto, una frase." },
+      { label: "Vacanza", text: "Ripensa a una vacanza, a una gita o a un viaggio che ti ha lasciato leggerezza e buonumore.", examples: "Esempi: il mare, la montagna, una passeggiata, un pranzo all’aperto, una città visitata con piacere, un panorama.", suggestions: "Fermati su particolari precisi: chi era con te, dove ti trovavi, che cosa vedevi o sentivi." },
+      { label: "Famiglia", text: "Lascia affiorare un momento semplice e bello vissuto in famiglia, magari con una persona che ti faceva stare bene.", examples: "Esempi: una tavolata, una festa in casa, una domenica serena, una frase affettuosa, un gesto di cura, un momento condiviso.", suggestions: "Prova a rendere il ricordo più nitido: una voce, una stanza, una frase, un piccolo gesto." },
+      { label: "Amicizia", text: "Pensa a un amico, a una conversazione o a un gesto di amicizia che ancora oggi ti scalda il cuore.", examples: "Esempi: una telefonata importante, una risata condivisa, un aiuto ricevuto, una confidenza, una passeggiata insieme.", suggestions: "Scava nel ricordo e trova almeno due particolari precisi che lo rendano vivo nella mente." },
+      { label: "Festa", text: "Ricorda una festa, una tavolata o un incontro gioioso che ti ha lasciato una bella sensazione.", examples: "Esempi: un compleanno, una festa di paese, una cena riuscita, una musica, un brindisi, un momento di allegria condivisa.", suggestions: "Rivedi la scena e cerca elementi concreti: volti, suoni, odori, oggetti, parole." },
+      { label: "Casa", text: "Ripensa a una casa, a una stanza o a un’atmosfera domestica in cui ti sei sentito protetto e sereno.", examples: "Esempi: la cucina di casa, un balcone, una poltrona amata, un profumo familiare, una finestra, una sera tranquilla.", suggestions: "Più il ricordo si riempie di dettagli, più diventa un vero esercizio di memoria." },
+      { label: "Fede", text: "Ricorda un momento di preghiera, una celebrazione o un gesto di fede che ti ha dato pace.", examples: "Esempi: una chiesa silenziosa, una preghiera detta con calma, una messa, una benedizione, un canto, un gesto semplice ma profondo.", suggestions: "Prova a ricordare il luogo, le persone, le parole o il clima interiore di quel momento." },
+      { label: "Natura", text: "Pensa a un paesaggio, a una passeggiata o a un momento all’aperto che ti ha fatto respirare meglio dentro.", examples: "Esempi: un bosco, il mare, una collina, un sentiero, un tramonto, il vento sul viso, il canto degli uccelli.", suggestions: "Scava nel ricordo e cerca colori, suoni, profumi o particolari del paesaggio." },
+      { label: "Luogo del cuore", text: "Lascia emergere un luogo speciale in cui ti sei sentito bene e che ancora oggi ti richiama serenità.", examples: "Esempi: una piazza, una chiesa, una casa, una spiaggia, una collina, una panchina, un giardino.", suggestions: "Prova a ricostruire bene la scena: dove eri, con chi, che cosa ti colpiva di quel luogo." }
     ];
 
     let currentWords = [];
@@ -262,7 +203,6 @@
     let currentSequence = [];
     let sequenceTimer = null;
     let lastSequenceKey = '';
-    let storedMemoryTriplet = { person:'', place:'', detail:'' };
 
     function playBeep() {
       try {
@@ -276,7 +216,7 @@
         g.connect(ctx.destination);
         o.start();
         o.stop(ctx.currentTime + 0.2);
-      } catch (e) {}
+      } catch(e) {}
     }
 
     function showOnly(cardId) {
@@ -309,14 +249,18 @@
       return Math.floor(Math.random() * 90) + 10;
     }
 
-    function buildSequence(avoidCurrent = false) {
+    function buildSequence(avoidCurrent=false) {
       let seq, key, attempts = 0;
       do {
         const first = randomTwoDigitNumber();
         let second = randomTwoDigitNumber();
         while (second === first) second = randomTwoDigitNumber();
-        const word = pickRandom(sequenceWords);
-        seq = [String(first), word, String(second)];
+
+        const word1 = pickRandom(sequenceWords);
+        let word2 = pickRandom(sequenceWords);
+        while (word2 === word1) word2 = pickRandom(sequenceWords);
+
+        seq = [String(first), word1, String(second), word2];
         key = seq.join('|');
         attempts++;
       } while (avoidCurrent && key === lastSequenceKey && attempts < 20);
@@ -330,11 +274,12 @@
       document.getElementById('memoryThemeLabel').innerHTML = `<strong>Tema proposto oggi:</strong> ${theme.label}`;
       document.getElementById('memoryThemeText').textContent = theme.text;
       document.getElementById('memoryExamples').textContent = theme.examples;
-      document.getElementById('memorySuggestions').textContent = theme.suggestions;
+      const suggestionsEl = document.getElementById('memorySuggestions');
+      if (suggestionsEl) suggestionsEl.textContent = theme.suggestions;
       return theme;
     }
 
-    function autoNext(current, nextId, maxLength = 2) {
+    function autoNext(current, nextId, maxLength=2) {
       current.value = current.value.replace(/\s+/g, '');
       if (current.value.length > maxLength) current.value = current.value.slice(0, maxLength);
       if (current.value.length >= maxLength) {
@@ -384,7 +329,7 @@
       }, 5000);
     }
 
-    function prepareSequenceExercise(avoidCurrent = false) {
+    function prepareSequenceExercise(avoidCurrent=false) {
       if (sequenceTimer) clearTimeout(sequenceTimer);
       currentSequence = buildSequence(avoidCurrent);
       document.getElementById('sequenceList').innerHTML = currentSequence.map(item => `<span class="word">${item}</span>`).join('');
@@ -396,6 +341,7 @@
       document.getElementById('s1').value = '';
       document.getElementById('s2').value = '';
       document.getElementById('s3').value = '';
+      document.getElementById('s4').value = '';
     }
 
     function scheduleSequenceHide() {
@@ -409,7 +355,7 @@
       }, 5000);
     }
 
-    function nextIntruderSet(avoidCurrent = false) {
+    function nextIntruderSet(avoidCurrent=false) {
       if (intruderTimer) clearTimeout(intruderTimer);
       let nextIndex = (intruderIndex + 1) % intruderSets.length;
       if (avoidCurrent && intruderSets.length > 1 && nextIndex === intruderIndex) {
@@ -447,20 +393,6 @@
       }, 5000);
     }
 
-    function resetThemeExercise() {
-      storedMemoryTriplet = { person:'', place:'', detail:'' };
-      document.getElementById('memorySaved').textContent = '';
-      document.getElementById('memoryThemeChoiceRow').classList.add('hidden');
-      document.getElementById('memoryWriteArea').classList.remove('hidden');
-      document.getElementById('memoryRecallArea').classList.add('hidden');
-      document.getElementById('memoryPerson').value = '';
-      document.getElementById('memoryPlace').value = '';
-      document.getElementById('memoryDetail').value = '';
-      document.getElementById('memoryPersonRecall').value = '';
-      document.getElementById('memoryPlaceRecall').value = '';
-      document.getElementById('memoryDetailRecall').value = '';
-    }
-
     function prepareJourney() {
       if (memoryTimer) clearTimeout(memoryTimer);
       if (sequenceTimer) clearTimeout(sequenceTimer);
@@ -470,9 +402,13 @@
       prepareWordExercise();
       prepareSequenceExercise(false);
       nextIntruderSet(false);
+      document.getElementById('memorySaved').textContent = '';
+      document.getElementById('memoryPerson').value = '';
+      document.getElementById('memoryPlace').value = '';
+      document.getElementById('memoryAction').value = '';
+      document.getElementById('memoryDetail').value = '';
       memoryThemeIndex = -1;
       nextMemoryTheme();
-      resetThemeExercise();
     }
 
     function startJourney() {
@@ -538,18 +474,19 @@
       const given = [
         normalize(document.getElementById('s1').value),
         normalize(document.getElementById('s2').value),
-        normalize(document.getElementById('s3').value)
+        normalize(document.getElementById('s3').value),
+        normalize(document.getElementById('s4').value)
       ];
       const expected = currentSequence.map(item => normalize(item));
       let score = 0;
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < 4; i++) {
         if (given[i] === expected[i]) score++;
       }
       const res = document.getElementById('sequenceResult');
-      if (score === 3) {
+      if (score === 4) {
         res.textContent = 'Ottimo! Hai ricostruito correttamente tutta la sequenza.';
       } else if (score > 0) {
-        res.textContent = `Hai ricostruito correttamente ${score} elementi su 3. La sequenza era: ${currentSequence.join(' - ')}.`;
+        res.textContent = `Hai ricostruito correttamente ${score} elementi su 4. La sequenza era: ${currentSequence.join(' - ')}.`;
       } else {
         res.textContent = `La sequenza era: ${currentSequence.join(' - ')}.`;
       }
@@ -592,55 +529,46 @@
 
     function goToMemoryFeelGood() {
       nextMemoryTheme();
-      resetThemeExercise();
       showOnly('feelGoodCard');
     }
 
-    function storeMemoryTriplet() {
+    function saveMemoryNote() {
       const person = document.getElementById('memoryPerson').value.trim();
       const place = document.getElementById('memoryPlace').value.trim();
+      const action = document.getElementById('memoryAction').value.trim();
       const detail = document.getElementById('memoryDetail').value.trim();
+      const output = document.getElementById('memorySaved');
+      const summary = document.getElementById('memorySummary');
 
-      if (!person && !place && !detail) {
-        document.getElementById('memorySaved').textContent = 'Prova a scrivere almeno un elemento del ricordo.';
+      const filled = [person, place, action, detail].filter(Boolean).length;
+
+      summary.classList.add('hidden');
+      summary.innerHTML = '';
+
+      if (filled === 0) {
+        output.textContent = 'Hai richiamato un ricordo. Prova a scrivere almeno un elemento per renderlo più nitido.';
         return;
       }
 
-      storedMemoryTriplet = { person, place, detail };
-      document.getElementById('memorySaved').textContent = '';
-      document.getElementById('memoryWriteArea').classList.add('hidden');
-      document.getElementById('memoryRecallArea').classList.remove('hidden');
-      document.getElementById('memoryPersonRecall').focus();
-    }
-
-    function checkMemoryTriplet() {
-      const p1 = normalize(storedMemoryTriplet.person);
-      const p2 = normalize(storedMemoryTriplet.place);
-      const p3 = normalize(storedMemoryTriplet.detail);
-
-      const r1 = normalize(document.getElementById('memoryPersonRecall').value);
-      const r2 = normalize(document.getElementById('memoryPlaceRecall').value);
-      const r3 = normalize(document.getElementById('memoryDetailRecall').value);
-
-      let score = 0;
-      if (p1 === r1) score++;
-      if (p2 === r2) score++;
-      if (p3 === r3) score++;
-
-      const output = document.getElementById('memorySaved');
-      if (score === 3) {
-        output.textContent = 'Ottimo! Hai richiamato correttamente tutti e 3 gli elementi del ricordo.';
-      } else if (score > 0) {
-        output.textContent = `Bene. Hai richiamato correttamente ${score} elementi su 3.`;
-      } else {
-        output.textContent = 'Hai provato comunque bene. Il ricordo fissato era: persona, luogo, dettaglio.';
+      if (filled === 4) {
+        summary.innerHTML = `<strong>Il tuo ricordo ricomposto</strong><br>C’era <strong>${person}</strong>, eri <strong>${place}</strong>, stava succedendo <strong>${action}</strong> e ti è rimasto impresso <strong>${detail}</strong>.`;
+        summary.classList.remove('hidden');
+        output.textContent = 'Ottimo. Hai ricostruito un ricordo con persona, luogo, scena e dettaglio preciso. Questo è un vero esercizio di memoria.';
+        return;
       }
 
-      document.getElementById('memoryThemeChoiceRow').classList.remove('hidden');
-    }
+      const parts = [];
+      if (person) parts.push(`c’era <strong>${person}</strong>`);
+      if (place) parts.push(`eri <strong>${place}</strong>`);
+      if (action) parts.push(`stava succedendo <strong>${action}</strong>`);
+      if (detail) parts.push(`ti è rimasto impresso <strong>${detail}</strong>`);
 
-    function repeatThemeMemory() {
-      resetThemeExercise();
+      if (parts.length > 0) {
+        summary.innerHTML = `<strong>Il tuo ricordo ricomposto</strong><br>${parts.join(', ')}.`;
+        summary.classList.remove('hidden');
+      }
+
+      output.textContent = `Bene. Hai già fissato ${filled} elementi del ricordo. Se riesci, aggiungine ancora per allenare meglio la memoria.`;
     }
 
     function newExercise() {
