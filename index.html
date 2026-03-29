@@ -126,9 +126,10 @@
       <h2>Custodisci questo ricordo</h2>
       <p class="small" id="memoryThemeLabel"><strong>Tema proposto oggi:</strong> Infanzia</p>
       <button type="button" class="secondary-btn" onclick="nextMemoryTheme()">Cambia tema</button>
-      <p class="small" id="memoryThemeText">Pensa a una persona, a un luogo o a un momento dell’infanzia che ancora oggi ti fa stare bene.</p>
-      <p class="question">Prenditi un momento di calma e lascia affiorare un ricordo preciso.</p>
+      <p class="small" id="memoryThemeText">Prova a tornare indietro nel tempo e richiama un ricordo lontano, non recente, che ancora oggi ti fa stare bene.</p>
+      <p class="question">Prenditi un momento di calma e lascia affiorare un ricordo lontano nel tempo, cercando di ricostruirlo con precisione.</p>
       <p class="small" id="memoryExamples">Esempi: un gioco, un cortile, una maestra gentile, una voce amata, una merenda felice, un nonno o una nonna.</p>
+      <p class="small" id="memorySuggestions">I ricordi più lontani richiedono più attenzione: proprio per questo allenano meglio la memoria.</p>
 
       <p class="small"><strong>1. Chi c’era?</strong></p>
       <input type="text" id="memoryPerson" placeholder="Una persona o più persone presenti" />
@@ -179,16 +180,19 @@
     intruderSets.sort(() => Math.random() - 0.5);
 
     const memoryThemes = [
-      { label: "Infanzia", text: "Pensa a una persona, a un luogo o a un momento dell’infanzia che ancora oggi ti fa stare bene.", examples: "Esempi: un gioco, un cortile, una maestra gentile, una voce amata, una merenda felice, un nonno o una nonna.", suggestions: "Rivivi per qualche istante questo ricordo e prova a coglierne almeno due dettagli precisi. Più il ricordo è nitido, più la memoria lavora bene." },
-      { label: "Lavoro", text: "Ricorda un episodio del lavoro o di un impegno importante in cui ti sei sentito utile, sereno o soddisfatto.", examples: "Esempi: un compito riuscito bene, un collega stimato, un ringraziamento ricevuto, una giornata ordinata, un lavoro fatto con cura.", suggestions: "Riprova a vedere la scena nella mente e cerca particolari più concreti: una persona, un luogo, un gesto, una frase." },
-      { label: "Vacanza", text: "Ripensa a una vacanza, a una gita o a un viaggio che ti ha lasciato leggerezza e buonumore.", examples: "Esempi: il mare, la montagna, una passeggiata, un pranzo all’aperto, una città visitata con piacere, un panorama.", suggestions: "Fermati su particolari precisi: chi era con te, dove ti trovavi, che cosa vedevi o sentivi." },
-      { label: "Famiglia", text: "Lascia affiorare un momento semplice e bello vissuto in famiglia, magari con una persona che ti faceva stare bene.", examples: "Esempi: una tavolata, una festa in casa, una domenica serena, una frase affettuosa, un gesto di cura, un momento condiviso.", suggestions: "Prova a rendere il ricordo più nitido: una voce, una stanza, una frase, un piccolo gesto." },
-      { label: "Amicizia", text: "Pensa a un amico, a una conversazione o a un gesto di amicizia che ancora oggi ti scalda il cuore.", examples: "Esempi: una telefonata importante, una risata condivisa, un aiuto ricevuto, una confidenza, una passeggiata insieme.", suggestions: "Scava nel ricordo e trova almeno due particolari precisi che lo rendano vivo nella mente." },
-      { label: "Festa", text: "Ricorda una festa, una tavolata o un incontro gioioso che ti ha lasciato una bella sensazione.", examples: "Esempi: un compleanno, una festa di paese, una cena riuscita, una musica, un brindisi, un momento di allegria condivisa.", suggestions: "Rivedi la scena e cerca elementi concreti: volti, suoni, odori, oggetti, parole." },
-      { label: "Casa", text: "Ripensa a una casa, a una stanza o a un’atmosfera domestica in cui ti sei sentito protetto e sereno.", examples: "Esempi: la cucina di casa, un balcone, una poltrona amata, un profumo familiare, una finestra, una sera tranquilla.", suggestions: "Più il ricordo si riempie di dettagli, più diventa un vero esercizio di memoria." },
-      { label: "Fede", text: "Ricorda un momento di preghiera, una celebrazione o un gesto di fede che ti ha dato pace.", examples: "Esempi: una chiesa silenziosa, una preghiera detta con calma, una messa, una benedizione, un canto, un gesto semplice ma profondo.", suggestions: "Prova a ricordare il luogo, le persone, le parole o il clima interiore di quel momento." },
-      { label: "Natura", text: "Pensa a un paesaggio, a una passeggiata o a un momento all’aperto che ti ha fatto respirare meglio dentro.", examples: "Esempi: un bosco, il mare, una collina, un sentiero, un tramonto, il vento sul viso, il canto degli uccelli.", suggestions: "Scava nel ricordo e cerca colori, suoni, profumi o particolari del paesaggio." },
-      { label: "Luogo del cuore", text: "Lascia emergere un luogo speciale in cui ti sei sentito bene e che ancora oggi ti richiama serenità.", examples: "Esempi: una piazza, una chiesa, una casa, una spiaggia, una collina, una panchina, un giardino.", suggestions: "Prova a ricostruire bene la scena: dove eri, con chi, che cosa ti colpiva di quel luogo." }
+      { label: "Infanzia", level: "lontano", text: "Prova a tornare indietro nel tempo e richiama un ricordo dell’infanzia, lontano e non recente, che ancora oggi ti fa stare bene.", examples: "Esempi: un gioco, un cortile, una maestra gentile, una voce amata, una merenda felice, un nonno o una nonna.", suggestions: "I ricordi più lontani richiedono più attenzione: proprio per questo allenano meglio la memoria." },
+      { label: "Scuola", level: "lontano", text: "Richiama un episodio della scuola, anche di molti anni fa, che ti è rimasto dentro con una sensazione buona.", examples: "Esempi: un compagno, una maestra, una gita, un’aula, una ricreazione, un momento riuscito bene.", suggestions: "Torna con calma a quegli anni e prova a recuperare particolari concreti: volti, parole, oggetti, atmosfera." },
+      { label: "Nonni", level: "lontano", text: "Ripensa a un momento vissuto con i nonni o con persone anziane care, cercando un ricordo lontano nel tempo.", examples: "Esempi: una cucina, una frase tipica, un gesto di affetto, una passeggiata, un pranzo, una casa di un tempo.", suggestions: "Questi ricordi antichi allenano molto la memoria: prova a ricostruire bene la scena." },
+      { label: "Primi lavori", level: "lontano", text: "Pensa a un episodio dei primi lavori o dei primi impegni della tua vita adulta, possibilmente non recente.", examples: "Esempi: un collega, un datore di lavoro, un compito riuscito, un ambiente di lavoro, una soddisfazione ricevuta.", suggestions: "Cerca di rivedere bene il luogo, le persone e un dettaglio preciso di quel tempo." },
+      { label: "Lavoro", level: "intermedio", text: "Richiama un episodio del lavoro o di un impegno importante di qualche anno fa, in cui ti sei sentito utile, sereno o soddisfatto.", examples: "Esempi: un compito riuscito bene, un collega stimato, un ringraziamento ricevuto, una giornata ordinata, un lavoro fatto con cura.", suggestions: "Prova a vedere meglio la scena nella mente: una persona, un luogo, un gesto, una frase." },
+      { label: "Vacanza", level: "intermedio", text: "Ripensa a una vacanza, a una gita o a un viaggio di qualche anno fa che ti ha lasciato leggerezza e buonumore.", examples: "Esempi: il mare, la montagna, una passeggiata, un pranzo all’aperto, una città visitata con piacere, un panorama.", suggestions: "Fermati su particolari precisi: chi era con te, dove ti trovavi, che cosa vedevi o sentivi." },
+      { label: "Famiglia", level: "intermedio", text: "Lascia affiorare un momento semplice e bello vissuto in famiglia, non troppo recente, che ti trasmette ancora serenità.", examples: "Esempi: una tavolata, una festa in casa, una domenica serena, una frase affettuosa, un gesto di cura, un momento condiviso.", suggestions: "Prova a rendere il ricordo più nitido: una voce, una stanza, una frase, un piccolo gesto." },
+      { label: "Amicizia", level: "intermedio", text: "Pensa a un amico, a una conversazione o a un gesto di amicizia di qualche anno fa che ancora oggi ti scalda il cuore.", examples: "Esempi: una telefonata importante, una risata condivisa, un aiuto ricevuto, una confidenza, una passeggiata insieme.", suggestions: "Scava nel ricordo e trova almeno due particolari precisi che lo rendano vivo nella mente." },
+      { label: "Festa", level: "intermedio", text: "Ricorda una festa, una tavolata o un incontro gioioso vissuto tempo fa e che ti ha lasciato una bella sensazione.", examples: "Esempi: un compleanno, una festa di paese, una cena riuscita, una musica, un brindisi, un momento di allegria condivisa.", suggestions: "Rivedi la scena e cerca elementi concreti: volti, suoni, odori, oggetti, parole." },
+      { label: "Casa", level: "intermedio", text: "Ripensa a una casa, a una stanza o a un’atmosfera domestica di qualche anno fa in cui ti sei sentito protetto e sereno.", examples: "Esempi: la cucina di casa, un balcone, una poltrona amata, un profumo familiare, una finestra, una sera tranquilla.", suggestions: "Più il ricordo si riempie di dettagli, più diventa un vero esercizio di memoria." },
+      { label: "Fede", level: "intermedio", text: "Ricorda un momento di preghiera, una celebrazione o un gesto di fede non recente che ti ha dato pace.", examples: "Esempi: una chiesa silenziosa, una preghiera detta con calma, una messa, una benedizione, un canto, un gesto semplice ma profondo.", suggestions: "Prova a ricordare il luogo, le persone, le parole o il clima interiore di quel momento." },
+      { label: "Natura", level: "intermedio", text: "Pensa a un paesaggio, a una passeggiata o a un momento all’aperto vissuto tempo fa che ti ha fatto respirare meglio dentro.", examples: "Esempi: un bosco, il mare, una collina, un sentiero, un tramonto, il vento sul viso, il canto degli uccelli.", suggestions: "Scava nel ricordo e cerca colori, suoni, profumi o particolari del paesaggio." },
+      { label: "Luogo del cuore", level: "intermedio", text: "Lascia emergere un luogo speciale, conosciuto da tempo, in cui ti sei sentito bene e che ancora oggi ti richiama serenità.", examples: "Esempi: una piazza, una chiesa, una casa, una spiaggia, una collina, una panchina, un giardino.", suggestions: "Prova a ricostruire bene la scena: dove eri, con chi, che cosa ti colpiva di quel luogo." }
     ];
 
     let currentWords = [];
@@ -546,14 +550,14 @@
       summary.innerHTML = '';
 
       if (filled === 0) {
-        output.textContent = 'Hai richiamato un ricordo. Prova a scrivere almeno un elemento per renderlo più nitido.';
+        output.textContent = 'Hai iniziato a richiamare un ricordo lontano. Prova a scrivere almeno un elemento per renderlo più nitido.';
         return;
       }
 
       if (filled === 4) {
         summary.innerHTML = `<strong>Il tuo ricordo ricomposto</strong><br>C’era <strong>${person}</strong>, eri <strong>${place}</strong>, stava succedendo <strong>${action}</strong> e ti è rimasto impresso <strong>${detail}</strong>.`;
         summary.classList.remove('hidden');
-        output.textContent = 'Ottimo. Hai ricostruito un ricordo con persona, luogo, scena e dettaglio preciso. Questo è un vero esercizio di memoria.';
+        output.textContent = 'Ottimo. Hai ricostruito un ricordo lontano con persona, luogo, scena e dettaglio preciso. Questo è un vero esercizio di memoria profonda.';
         return;
       }
 
@@ -568,7 +572,7 @@
         summary.classList.remove('hidden');
       }
 
-      output.textContent = `Bene. Hai già fissato ${filled} elementi del ricordo. Se riesci, aggiungine ancora per allenare meglio la memoria.`;
+      output.textContent = `Bene. Hai già fissato ${filled} elementi di un ricordo lontano. Se riesci, aggiungine ancora per allenare meglio la memoria profonda.`;
     }
 
     function newExercise() {
